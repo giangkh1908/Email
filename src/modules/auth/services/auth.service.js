@@ -1,5 +1,6 @@
 import { User } from "../models/user.model.js";
 import { tokenService } from "./token.service.js";
+import bcrypt from "bcrypt";
 
 export const authService = {
   login: async ({ email, password }) => {
@@ -10,7 +11,7 @@ export const authService = {
       throw error;
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       const error = new Error("Email hoặc mật khẩu không đúng");
       error.status = 401;

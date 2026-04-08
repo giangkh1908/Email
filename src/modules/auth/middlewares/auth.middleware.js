@@ -1,3 +1,5 @@
+import { tokenService } from "../services/token.service.js";
+
 export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -11,7 +13,6 @@ export const authMiddleware = (req, res, next) => {
   const accessToken = authHeader.split(" ")[1];
 
   try {
-    const { tokenService } = require("../services/token.service.js");
     const decoded = tokenService.verifyAccessToken(accessToken);
 
     if (!decoded) {
