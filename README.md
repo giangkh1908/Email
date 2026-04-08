@@ -1,45 +1,48 @@
 # Email Service
 
-This is a [NestJS](https://nestjs.com/) REST API for managing and sending emails, built with TypeScript and connected to MongoDB.
+Dự án REST API phục vụ cho việc quản lý và gửi email, được xây dựng bằng **Node.js**, **Express** và lưu trữ dữ liệu trên **MongoDB**.
 
 ## Tech Stack
-- **Framework:** NestJS
+- **Framework:** Express.js
 - **Database:** MongoDB (Mongoose)
 - **Environment:** Node.js
+- **Authentication:** JSON Web Token (JWT) & Bcrypt
 
-## Project setup
+## Cấu trúc thư mục
 
-1. Install dependencies:
+```text
+src/
+├── config/       # Cấu hình hệ thống (Database kết nối, config các thư viện)
+├── controller/   # Tiếp nhận request và trả về response cho các API
+├── middlewares/  # Chứa các middleware (Authentication, Error Handler...)
+├── models/       # Định nghĩa các Schema của database (Mongoose)
+├── routes/       # Khai báo các route (endpoint) của ứng dụng
+├── services/     # Chứa logic nghiệp vụ xử lý chính của email
+└── utils/        # Các hàm helper hoặc tiện ích dùng chung
+```
+
+## Setup dự án
+
+1. Cài đặt các thư viện (dependencies):
 ```bash
 npm install
 ```
 
-2. Setup environment variables:
-Create a `.env` file in the root directory and add your MongoDB connection string:
+2. Cài đặt biến môi trường:
+Tạo một file `.env` ở thư mục gốc của dự án và thêm thông tin sau:
 ```bash
 MONGO_URL=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
+PORT=5000
+# JWT_SECRET=your_jwt_secret_key
 ```
 
-## Running the application
+## Chạy ứng dụng
 
 ```bash
-# development
-npm run start
+# Môi trường phát triển (có nodemon để tự động restart khi code thay đổi)
+npm run dev
 
-# watch mode (recommended for development)
-npm run start:dev
-
-# production mode
-npm run start:prod
-```
-
-## Running tests
-
-```bash
-# unit tests
-npm run test
-
-# e2e tests
-npm run test:e2e
+# Môi trường Production
+npm start
 ```
 
