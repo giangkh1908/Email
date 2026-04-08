@@ -1,48 +1,49 @@
-# Email Service
+# AI Email Agent
 
-Dự án REST API phục vụ cho việc quản lý và gửi email, được xây dựng bằng **Node.js**, **Express** và lưu trữ dữ liệu trên **MongoDB**.
+Hệ thống AI Agent tự động viết email xin việc.
 
 ## Tech Stack
-- **Framework:** Express.js
+
+- **Runtime:** Node.js
+- **Framework:** Express.js (ES Modules)
 - **Database:** MongoDB (Mongoose)
-- **Environment:** Node.js
-- **Authentication:** JSON Web Token (JWT) & Bcrypt
+- **Cache/Queue:** Redis
+- **Authentication:** JWT + OTP
 
-## Cấu trúc thư mục
+## Architecture
 
-```text
-src/
-├── config/       # Cấu hình hệ thống (Database kết nối, config các thư viện)
-├── controller/   # Tiếp nhận request và trả về response cho các API
-├── middlewares/  # Chứa các middleware (Authentication, Error Handler...)
-├── models/       # Định nghĩa các Schema của database (Mongoose)
-├── routes/       # Khai báo các route (endpoint) của ứng dụng
-├── services/     # Chứa logic nghiệp vụ xử lý chính của email
-└── utils/        # Các hàm helper hoặc tiện ích dùng chung
-```
+**Modular Architecture** - Tổ chức theo modules, mỗi module chứa logic của riêng feature.
 
-## Setup dự án
+## Features
 
-1. Cài đặt các thư viện (dependencies):
+- **Authentication:** Register, Login, Logout với JWT
+- **Email Verification:** OTP qua email
+- **Email Validation:** 2-layer validation (blocklist, MX check)
+- **Email Queue:** Redis queue cho việc gửi email
+- **Token Management:** Access Token + Refresh Token với HttpOnly Cookie
+
+## Setup
+
 ```bash
 npm install
 ```
 
-2. Cài đặt biến môi trường:
-Tạo một file `.env` ở thư mục gốc của dự án và thêm thông tin sau:
-```bash
-MONGO_URL=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
-PORT=5000
-# JWT_SECRET=your_jwt_secret_key
-```
+Tạo file `.env` với các biến môi trường cần thiết. 
 
-## Chạy ứng dụng
+## Run
 
 ```bash
-# Môi trường phát triển (có nodemon để tự động restart khi code thay đổi)
-npm run dev
-
-# Môi trường Production
-npm start
+npm run dev    # Development
+npm start      # Production
 ```
 
+## API Endpoints
+
+| Method | Endpoint | Mô tả |
+|--------|----------|--------|
+| POST | `/api/auth/register/send-otp` | Gửi OTP đến email |
+| POST | `/api/auth/register/verify-otp` | Verify OTP + Tạo user |
+| POST | `/api/auth/login` | Đăng nhập |
+| POST | `/api/auth/refresh` | Refresh access token |
+| POST | `/api/auth/logout` | Đăng xuất |
+| GET | `/api/auth/profile` | Lấy thông tin user |
