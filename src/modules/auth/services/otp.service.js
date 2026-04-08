@@ -1,13 +1,10 @@
 import bcrypt from "bcrypt";
 import redis from "../../../database/redis.js";
-import { validateEmail } from "./email-validation.service.js";
-import { emailQueueService } from "./email-queue.service.js";
-import { tokenService } from "./token.service.js";
+import { validateEmail } from "../services/email-validation.service.js";
+import { emailQueueService } from "../services/email-queue.service.js";
+import { tokenService } from "../services/token.service.js";
 import { User } from "../models/user.model.js";
-
-const OTP_TTL = 300;
-const MAX_ATTEMPTS = 5;
-const RESEND_COOLDOWN = 300;
+import { OTP_TTL, MAX_ATTEMPTS, RESEND_COOLDOWN } from "../constants/otp.constants.js";
 
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();

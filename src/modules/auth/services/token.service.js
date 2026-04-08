@@ -1,8 +1,5 @@
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
-const JWT_ACCESS_EXPIRES = "15m";
-const JWT_REFRESH_EXPIRES = "7d";
+import { JWT_SECRET, JWT_ACCESS_EXPIRES, JWT_REFRESH_EXPIRES } from "../constants/jwt.constants.js";
 
 export const tokenService = {
   generateAccessToken: (userId) => {

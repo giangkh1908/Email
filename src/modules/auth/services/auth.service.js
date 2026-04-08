@@ -1,44 +1,7 @@
 import { User } from "../models/user.model.js";
 import { tokenService } from "./token.service.js";
-import bcrypt from "bcrypt";
 
 export const authService = {
-  register: async ({ email, password, fullName }) => {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      const error = new Error("Email đã được sử dụng");
-      error.status = 400;
-      throw error;
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
-      email,
-      password: hashedPassword,
-      fullName,
-      credits: {
-        balance: 0,
-        totalPurchased: 0,
-        totalUsed: 0,
-      },
-    });
-
-    const accessToken = tokenService.generateAccessToken(user._id);
-    const refreshToken = tokenService.generateRefreshToken(user._id);
-
-    user.refreshToken = refreshToken;
-    await user.save();
-
-    return {
-      user: user.toJSON(),
-      tokens: {
-        accessToken,
-        refreshToken,
-      },
-    };
-  },
-
   login: async ({ email, password }) => {
     const user = await User.findOne({ email });
     if (!user) {
@@ -47,7 +10,7 @@ export const authService = {
       throw error;
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       const error = new Error("Email hoặc mật khẩu không đúng");
       error.status = 401;
@@ -62,15 +25,13 @@ export const authService = {
 
     return {
       user: user.toJSON(),
-      tokens: {
-        accessToken,
-        refreshToken,
-      },
+      accessToken,
+      refreshToken,
     };
   },
 
-  refreshToken: async (refreshToken) => {
-    const decoded = tokenService.verifyRefreshToken(refreshToken);
+  refreshToken: async (refreshTokenFromCookie) => {
+    const decoded = tokenService.verifyRefreshToken(refreshTokenFromCookie);
     if (!decoded) {
       const error = new Error("Refresh token không hợp lệ hoặc đã hết hạn");
       error.status = 401;
@@ -84,7 +45,7 @@ export const authService = {
       throw error;
     }
 
-    if (user.refreshToken !== refreshToken) {
+    if (user.refreshToken !== refreshTokenFromCookie) {
       const error = new Error("Refresh token không hợp lệ");
       error.status = 401;
       throw error;
@@ -97,10 +58,8 @@ export const authService = {
     await user.save();
 
     return {
-      tokens: {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      },
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     };
   },
 

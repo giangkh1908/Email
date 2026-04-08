@@ -21,6 +21,7 @@
   "homepage": "https://github.com/giangkh1908/Email#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "disposable-email-domains": "^1.0.62",
     "dotenv": "^17.4.1",

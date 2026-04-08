@@ -1,5 +1,6 @@
-import { otpService } from "../services/otp.service.js";
 import { authService } from "../services/auth.service.js";
+import { otpService } from "../services/otp.service.js";
+import { COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME } from "../constants/cookie.constants.js";
 
 export const authController = {
   sendOtp: async (req, res, next) => {
@@ -17,9 +18,15 @@ export const authController = {
   verifyOtp: async (req, res, next) => {
     try {
       const result = await otpService.verifyOtp(req.body);
+      
+      res.cookie(REFRESH_TOKEN_COOKIE_NAME, result.tokens.refreshToken, COOKIE_OPTIONS);
+      
       res.status(201).json({
         status: "success",
-        data: result,
+        data: {
+          user: result.user,
+          accessToken: result.tokens.accessToken,
+        },
       });
     } catch (error) {
       next(error);
@@ -29,9 +36,15 @@ export const authController = {
   login: async (req, res, next) => {
     try {
       const result = await authService.login(req.body);
+      
+      res.cookie(REFRESH_TOKEN_COOKIE_NAME, result.refreshToken, COOKIE_OPTIONS);
+      
       res.status(200).json({
         status: "success",
-        data: result,
+        data: {
+          user: result.user,
+          accessToken: result.accessToken,
+        },
       });
     } catch (error) {
       next(error);
@@ -40,11 +53,24 @@ export const authController = {
 
   refreshToken: async (req, res, next) => {
     try {
-      const { refreshToken } = req.body;
+      const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
+      
+      if (!refreshToken) {
+        return res.status(401).json({
+          status: "error",
+          message: "Refresh token không tìm thấy",
+        });
+      }
+      
       const result = await authService.refreshToken(refreshToken);
+      
+      res.cookie(REFRESH_TOKEN_COOKIE_NAME, result.refreshToken, COOKIE_OPTIONS);
+      
       res.status(200).json({
         status: "success",
-        data: result,
+        data: {
+          accessToken: result.accessToken,
+        },
       });
     } catch (error) {
       next(error);
@@ -54,6 +80,13 @@ export const authController = {
   logout: async (req, res, next) => {
     try {
       const result = await authService.logout(req.user.userId);
+      
+      res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+      
       res.status(200).json({
         status: "success",
         data: result,
